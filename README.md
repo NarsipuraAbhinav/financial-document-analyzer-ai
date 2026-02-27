@@ -1,38 +1,77 @@
-# Financial Document Analyzer - Debug Assignment
+### Financial Document Analyzer AI
+### Overview
 
-## Project Overview
-A comprehensive financial document analysis system that processes corporate reports, financial statements, and investment documents using AI-powered analysis agents.
+Brief description of what your project does.
 
-## Getting Started
+Example:
 
-### Install Required Libraries
-```sh
-pip install -r requirement.txt
-```
+AI-powered financial document analyzer built with CrewAI and FastAPI.
+It processes uploaded financial PDFs and generates investment insights using LLM agents.
 
-### Sample Document
-The system analyzes financial documents like Tesla's Q2 2025 financial update.
+### Installation
+```git clone https://github.com/<your-username>/financial-document-analyzer-ai.git```
 
-**To add Tesla's financial document:**
-1. Download the Tesla Q2 2025 update from: https://www.tesla.com/sites/default/files/downloads/TSLA-Q2-2025-Update.pdf
-2. Save it as `data/sample.pdf` in the project directory
-3. Or upload any financial PDF through the API endpoint
+```cd financial-document-analyzer-ai```
 
-**Note:** Current `data/sample.pdf` is a placeholder - replace with actual Tesla financial document for proper testing.
+```python -m venv venv```
 
-# You're All Not Set!
-🐛 **Debug Mode Activated!** The project has bugs waiting to be squashed - your mission is to fix them and bring it to life.
+```venv\Scripts\activate```  # Windows
 
-## Debugging Instructions
+```pip install -r requirements.txt```
 
-1. **Identify the Bug**: Carefully read the code in each file and understand the expected behavior. There is a bug in each line of code. So be careful.
-2. **Fix the Bug**: Implement the necessary changes to fix the bug.
-3. **Test the Fix**: Run the project and verify that the bug is resolved.
-4. **Repeat**: Continue this process until all bugs are fixed.
+Running with Ollama (Local LLM)
 
-## Expected Features
-- Upload financial documents (PDF format)
-- AI-powered financial analysis
-- Investment recommendations
-- Risk assessment
-- Market insights
+```ollama pull llama3.2:3b```
+
+```ollama run llama3.2:3b```
+
+Then start API:
+
+```uvicorn main:app --reload```
+
+### API Usage
+Endpoint:
+POST /analyze
+Form Data:
+
+file (PDF)
+
+query (optional)
+
+### Debugging Notes & Common Issues
+
+1. Changed the python version to "python 3.11"
+   
+2. Resolved bad dependency management design by trimming down the version pinned dependencies.
+
+3. ImportError: Cannot import name 'Agent' from 'Crewai.agents'
+
+   Fix: In agents.py, replace "from crewai.agents import Agent" with "from crewai import Agent". It is due to usage of new version
+
+4. ImportError: Cannot import name 'SerperDevTool'
+   
+   Fix: In tools.py, Update import according to new version.
+
+5. NameError: name "llm" is not defined
+   
+   Fix: In agents.py, change "llm=llm" to "llm = LLM(model="ollama/tinyllama", base_url="http://localhost:11434")"
+
+## API Issues
+
+1. Error: "detail": "Error processing financial document: 'function' object has no attribute 'get'"
+
+   Issue: The error occurred because a plain Python function was being passed as a tool to CrewAI's Task.
+
+   Fix: Replace "tools=[FinancialDocumentTool.read_data_tool]" with "tools=[FinancialDocumentTool()]"
+
+3. Error: Unexpected Internal Server Error / Runtime Conflict
+
+   Issue: Both the CrewAI task and the FastAPI endpoint function were defined with the same name: analyze_financial_document
+
+   Python does not allow two different objects with the same name in the same namespace without overwriting one.
+
+   Fix: Rename the task in task.py as "financial_analysis_task = Task(...)"
+
+### Sample Output
+
+<img width="1898" height="964" alt="Screenshot 2026-02-27 024518" src="https://github.com/user-attachments/assets/0c8c6420-87e8-4d32-bb8c-71bb72d05866" />
